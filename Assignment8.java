@@ -57,5 +57,20 @@ public class Assignment8 {
         System.out.println("Done Fetching records " + start + " to " + (end));
         return newList;
     }
+    public List<List<Integer>> getAllNumbers() {
+        List<List<Integer>> batches = new ArrayList<>();
+        int batchIndex = 0;
+        while (batchIndex < numbers.size()) {
+            int startIndex = batchIndex;
+            int endIndex = Math.min(startIndex + 1000, numbers.size());
+            List<Integer> batch = new ArrayList<>();
+            IntStream.range(startIndex, endIndex)
+                    .forEach(n -> batch.add(numbers.get(n)));
+            batches.add(batch);
+            batchIndex += 1000;
+        }
+        return batches;
+    }
 
 }
+
