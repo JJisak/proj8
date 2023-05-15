@@ -1,29 +1,35 @@
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class Main {
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+
+    public static void main(String[] args) throws IOException {
+
+
         Assignment8 assignment8 = new Assignment8();
+        List<Integer> numbers = Files.readAllLines(Paths.get("output.txt"))
+                .stream()
+                .map(n -> Integer.parseInt(n))
+                .collect(Collectors.toList());
 
-        // Use CompletableFuture to asynchronously fetch the data
-        CompletableFuture<List<Integer>> completableFuture = CompletableFuture.supplyAsync(() -> {
-            List<Integer> numbers = new ArrayList<>();
-            while (numbers.size() < 1000000) {
-                numbers.addAll(assignment8.getNumbers());
+
+
+        Map<Integer, Integer> countMap = new HashMap<>();
+        for (int number : numbers) {
+            Integer count = countMap.get(number);
+            if (count == null) {
+                count = 0;
             }
-            return numbers;
-        });
+            countMap.put(number, count + 1);
+        }
 
-        List<Integer> numbers = completableFuture.get();
-
-        Map<Integer, Integer> counts = new ConcurrentHashMap<>();
-        numbers.parallelStream().forEach(n -> {
-            counts.compute(n, (k, v) -> v == null ? 1 : v + 1);
-        });
-        counts.forEach((k, v) -> System.out.println(k + " = " + v ));
+        for (Map.Entry<Integer, Integer> entry : countMap.entrySet()) {
+            System.out.println(entry.getKey() + " = " + entry.getValue() );
+        }
     }
 }
