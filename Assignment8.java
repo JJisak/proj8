@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -9,7 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Assignment8 {
-
     private List<Integer> numbers = null;
     private AtomicInteger i = new AtomicInteger(0);
 
@@ -42,8 +40,7 @@ public class Assignment8 {
 
             System.out.println("Starting to fetch records " + start + " to " + (end));
         }
-        // force thread to pause for half a second to simulate actual Http / API traffic
-        // delay
+
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
@@ -57,20 +54,5 @@ public class Assignment8 {
         System.out.println("Done Fetching records " + start + " to " + (end));
         return newList;
     }
-    public List<List<Integer>> getAllNumbers() {
-        List<List<Integer>> batches = new ArrayList<>();
-        int batchIndex = 0;
-        while (batchIndex < numbers.size()) {
-            int startIndex = batchIndex;
-            int endIndex = Math.min(startIndex + 1000, numbers.size());
-            List<Integer> batch = new ArrayList<>();
-            IntStream.range(startIndex, endIndex)
-                    .forEach(n -> batch.add(numbers.get(n)));
-            batches.add(batch);
-            batchIndex += 1000;
-        }
-        return batches;
-    }
 
 }
-
