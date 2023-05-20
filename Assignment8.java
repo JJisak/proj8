@@ -3,21 +3,18 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-public class Assignment8 {
+class Assignment8 {
     private List<Integer> numbers = null;
-    private AtomicInteger i = new AtomicInteger(0);
 
     public Assignment8() {
         try {
             // Make sure you download the output.txt file for Assignment 8
             // and place the file in the root of your Java project
-            numbers = Files.readAllLines(Paths.get("output.txt"))
-                    .stream()
-                    .map(n -> Integer.parseInt(n))
+            numbers = Files.lines(Paths.get("output.txt"))
+                    .parallel()
+                    .map(Integer::parseInt)
                     .collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();
@@ -26,33 +23,26 @@ public class Assignment8 {
 
     /**
      * This method will return the numbers that you'll need to process from the list
-     * of Integers. However, it can only return 1000 records at a time. You will
-     * need to call this method 1,000 times in order to retrieve all 1,000,000
-     * numbers from the list
+     * of Integers. However, it can only return a specified number of records at a time.
      *
-     * @return Integers from the parsed txt file, 1,000 numbers at a time
+     * @param index The index of the batch to fetch
+     * @return Integers from the parsed txt file, batchSize numbers at a time
      */
-    public List<Integer> getNumbers() {
-        int start, end;
-        synchronized (i) {
-            start = i.get();
-            end = i.addAndGet(1000);
+    public List<Integer> getNumbers(int index) {
+        int batchSize = 1000;
+        int start = index * batchSize;
+        int end = Math.min(start + batchSize, numbers.size());
 
-            System.out.println("Starting to fetch records " + start + " to " + (end));
-        }
+        System.out.println("Starting to fetch records " + start + " to " + (end - 1));
 
+        List<Integer> sublist = numbers.subList(start, end);
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-        List<Integer> newList = new ArrayList<>();
-        IntStream.range(start, end)
-                .forEach(n -> {
-                    newList.add(numbers.get(n));
-                });
-        System.out.println("Done Fetching records " + start + " to " + (end));
-        return newList;
+        System.out.println("Done fetching records " + start + " to " + (end - 1));
+        return new ArrayList<>(sublist);
     }
-
 }
